@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Loom Art Generator</title>
+	<style>
+		.palette {
+			display: flex;
+			margin-bottom: 10px;
+		}
+
+		.color {
+			width: 30px;
+			height: 30px;
+			margin: 5px;
+			border: 1px solid black;
+			cursor: pointer;
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(10, 30px);
+		}
+
+		.cell {
+			width: 30px;
+			height: 30px;
+			border: 1px solid black;
+			cursor: pointer;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class="palette">
+		<div class="color" style="background-color: red;"></div>
+		<div class="color" style="background-color: blue;"></div>
+		<div class="color" style="background-color: green;"></div>
+		<div class="color" style="background-color: yellow;"></div>
+		<div class="color" style="background-color: orange;"></div>
+		<div class="color" style="background-color: purple;"></div>
+		<div class="color" style="background-color: brown;"></div>
+		<div class="color" style="background-color: black;"></div>
+	</div>
+
+	<div class="grid"></div>
+
+	<button onclick="generateInstructions()">Generate Loom Instructions</button>
+
+	<pre id="instructions"></pre>
+
+	<script>
+		let selectedColor = 'red';
+		let isDragging = false;
+
+		const grid = document.querySelector('.grid');
+		for (let i = 0; i < 100; i++) {
+			const cell = document.createElement('div');
+			cell.className = 'cell';
+			cell.addEventListener('mousedown', function () {
+				isDragging = true;
+				cell.style.backgroundColor = selectedColor;
+			});
+			cell.addEventListener('mouseover', function () {
+				if (isDragging) {
+					cell.style.backgroundColor = selectedColor;
+				}
+			});
+			grid.appendChild(cell);
+		}
+
+		document.addEventListener('mouseup', function () {
+			isDragging = false;
+		});
+
+		document.querySelectorAll('.color').forEach(colorDiv => {
+			colorDiv.addEventListener('click', function () {
+				selectedColor = this.style.backgroundColor;
+			});
+		});
+
+		function generateInstructions() {
+			const instructionsElement = document.getElementById('instructions');
+			instructionsElement.textContent = '';
+			let currentRow = 1;
+			let currentColor = grid.children[0].style.backgroundColor || 'white';
+			let count = 0;
+
+			for (let i = 0; i < 100; i++) {
+				const cellColor = grid.children[i].style.backgroundColor || 'white';
+				if (cellColor === currentColor) {
+					count++;
+				} else {
+					instructionsElement.textContent += `Row ${currentRow}: Use Color ${currentColor} for ${count} stitches\n`;
+					count = 1;
+					currentColor = cellColor;
+				}
+				if ((i + 1) % 10 === 0) {
+					instructionsElement.textContent += `Row ${currentRow}: Use Color ${currentColor} for ${count} stitches\n`;
+					currentRow++;
+					count = 0;
+				}
+			}
+		}
+	</script>
+
+</body>
+
+</html>
